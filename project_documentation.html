@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimodal RAG Incident Analyzer - Documentation</title>
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-card: rgba(17, 24, 39, 0.85);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 {
+            color: var(--text-primary);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1rem;
+        }
+
+        h2 { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; }
+
+        p { margin-bottom: 1rem; color: var(--text-secondary); }
+
+        .card {
+            background-color: var(--bg-secondary);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        code {
+            background-color: rgba(255,255,255,0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #7dd3fc;
+        }
+
+        pre {
+            background-color: rgba(0,0,0,0.5);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 1rem;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            color: var(--text-primary);
+        }
+
+        ul, ol { margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-secondary); }
+        li { margin-bottom: 0.5rem; }
+
+        .tag {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tag-blue { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .tag-purple { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.4); }
+        .tag-green { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        th { color: var(--text-primary); font-weight: 600; background-color: rgba(0,0,0,0.2); }
+        td { color: var(--text-secondary); }
+
+        .architecture-img {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin: 1rem 0;
+            background: #fff;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Multimodal RAG Incident Analyzer</h1>
+    <p>An AI-powered DevOps incident diagnosis system that analyzes system logs, Kubernetes events, and dashboard screenshots using a Retrieval-Augmented Generation (RAG) pipeline.</p>
+
+    <div class="card">
+        <h2>Technology Stack</h2>
+        <div>
+            <span class="tag tag-blue">Python 3.11</span>
+            <span class="tag tag-blue">FastAPI</span>
+            <span class="tag tag-blue">Pydantic</span>
+        </div>
+        <div style="margin-top: 0.5rem;">
+            <span class="tag tag-purple">SentenceTransformers</span>
+            <span class="tag tag-purple">OpenAI CLIP</span>
+            <span class="tag tag-purple">LLMs (OpenAI/Fallback)</span>
+        </div>
+        <div style="margin-top: 0.5rem;">
+            <span class="tag tag-green">Qdrant Vector DB</span>
+            <span class="tag tag-green">Docker</span>
+            <span class="tag tag-green">HTML/CSS/JS UI</span>
+        </div>
+    </div>
+
+    <h2>System Architecture</h2>
+    <div class="card">
+        <p>The system orchestrates a complex multimodal pipeline to diagnose production incidents:</p>
+        <ol>
+            <li><strong>Input Parsing</strong>: Accepts syslog, Kubernetes events, generic text, and file uploads. Extracts key error signals and timestamps.</li>
+            <li><strong>Text Embedding</strong>: Uses <code>all-MiniLM-L6-v2</code> (SentenceTransformers) to convert log context and error signals into 384-dimensional vector embeddings.</li>
+            <li><strong>Image Encoding</strong>: Processes uploaded dashboard screenshots (e.g., Grafana/Prometheus) using OpenAI's <code>CLIP</code> (ViT-B/32) model to extract visual context natively.</li>
+            <li><strong>Retrieval Layer</strong>: Queries the locally-hosted <code>Qdrant</code> vector database to fetch relevant runbooks, architecture docs, and past troubleshooting records.</li>
+            <li><strong>AI Reasoning</strong>: Constructs a comprehensive prompt containing log traces, image descriptions, and retrieved context. Sends it to an LLM (or a highly capable local heuristic engine fallback) to synthesize a structured Incident Report.</li>
+        </ol>
+    </div>
+
+    <h2>Directory Structure</h2>
+    <pre><code>multimodelmcp/
+├── app/                  # Application Code
+│   ├── main.py           # FastAPI setup & lifecycle
+│   ├── config.py         # Env vars via Pydantic Settings
+│   ├── models.py         # Request/Response schemas & enums
+│   ├── routers/          # API Controllers
+│   │   ├── analyze.py    # Incident analysis endpoints
+│   │   └── knowledge.py  # Runbook CRUD endpoints
+│   ├── services/         # Core Logic
+│   │   ├── analyzer.py   # RAG pipeline orchestrator
+│   │   ├── embeddings.py # Local txt/img embedding generation
+│   │   ├── llm.py        # OpenAI + heuristic fallback
+│   │   ├── log_parser.py # Regex log extractor
+│   │   └── vector_store.py # Qdrant client wrapper
+│   └── static/           # Frontend GUI
+│       ├── index.html
+│       ├── style.css
+│       └── app.js
+├── data/sample_docs/     # Example infrastructure runbooks
+├── sample_incidents/     # Example broken logs (OOM, etc.)
+├── docker-compose.yml    # Runs Qdrant + API
+├── Dockerfile            # API container spec
+└── requirements.txt      # Python deps (torch, transformers, etc.)</code></pre>
+
+    <h2>API Reference</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th>Method</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>/api/analyze</code></td>
+                <td>POST</td>
+                <td>Analyzes text logs or image files and returns a JSON <code>IncidentReport</code>.</td>
+            </tr>
+            <tr>
+                <td><code>/api/knowledge/ingest</code></td>
+                <td>POST</td>
+                <td>Embeds and stores a new runbook doc in the Qdrant DB.</td>
+            </tr>
+            <tr>
+                <td><code>/api/knowledge/documents</code></td>
+                <td>GET</td>
+                <td>Retrieves metadata for all stored context documents.</td>
+            </tr>
+            <tr>
+                <td><code>/api/knowledge/documents/{id}</code></td>
+                <td>DELETE</td>
+                <td>Removes a document from the vector store.</td>
+            </tr>
+            <tr>
+                <td><code>/health</code></td>
+                <td>GET</td>
+                <td>System diagnostics (DB connection, models loaded).</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="card">
+        <h2>Deployment & Quick Start</h2>
+        <p>Ensure Docker is running, then execute the following to start the Vector DB:</p>
+        <pre><code>docker-compose up -d qdrant</code></pre>
+
+        <p>Set up the Python environment and run the backend:</p>
+        <pre><code>python -m venv venv
+# Windows: .\venv\Scripts\activate
+# Mac/Linux: source venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+</code></pre>
+
+        <p>Open <strong><a href="http://localhost:8000" style="color:var(--accent-blue)">http://localhost:8000</a></strong> in your browser to access the graphical UI.</p>
+    </div>
+
+</body>
+</html>
